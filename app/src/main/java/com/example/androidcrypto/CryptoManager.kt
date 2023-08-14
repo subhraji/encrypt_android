@@ -2,6 +2,7 @@ package com.example.androidcrypto
 
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import java.io.OutputStream
 import java.security.KeyStore
 import java.security.KeyStore.SecretKeyEntry
 import javax.crypto.Cipher
@@ -43,6 +44,18 @@ class CryptoManager {
             )
         }.generateKey()
     }
+
+    fun encrypt(bytes: ByteArray, outputStream: OutputStream): ByteArray{
+        val encryptedBytes = encryptCipher.doFinal(bytes)
+        outputStream.use {
+            it.write(encryptCipher.iv.size)
+            it.write(encryptCipher.iv)
+            it.write(encryptedBytes.size)
+            it.write(encryptedBytes)
+        }
+        return encryptedBytes
+    }
+
     companion object{
         private const val ALGORITHM = KeyProperties.KEY_ALGORITHM_AES
         private const val BLOCK_MODE = KeyProperties.BLOCK_MODE_CBC
